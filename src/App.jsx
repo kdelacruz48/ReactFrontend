@@ -226,7 +226,25 @@ const fetchPosts = useCallback(() => {
 
      {auth.token && (
   <button className="mobile-logout-btn" onClick={handleLogout}>
-  ⏻
+  <span style={{
+    display: "block",
+    width: "14px",
+    height: "14px",
+    borderRadius: "50%",
+    border: "2px solid var(--accent)",
+    borderTopColor: "transparent",
+    position: "relative",
+  }}>
+    <span style={{
+      position: "absolute",
+      top: "-5px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "2px",
+      height: "8px",
+      backgroundColor: "var(--accent)",
+    }} />
+  </span>
 </button>
 )}
 
