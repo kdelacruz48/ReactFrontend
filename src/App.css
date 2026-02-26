@@ -1,0 +1,805 @@
+/* =========================
+   Global Theme Variables
+========================= */
+
+:root {
+  --bg-main: #0F0F0F;
+  --bg-secondary: #1E1E1E;
+  --bg-card: #252525;
+  --text-primary: #EAEAEA;
+  --text-secondary: #A0A0A0;
+  --accent: #00C2A8;
+  --accent-dim: rgba(0, 194, 168, 0.15);
+  --accent-glow: rgba(0, 194, 168, 0.35);
+  --border: rgba(255,255,255,0.07);
+}
+
+/* =========================
+   Layout
+========================= */
+
+html, body, #root {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .app-root {
+    height: auto;
+    overflow: visible;
+  }
+}
+
+/* =========================
+   Header
+========================= */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #1A1A1A;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* =========================
+   Split Layout
+========================= */
+
+.split-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 65px); /* subtract header height */
+  overflow: hidden;
+}
+
+/* ── Top half: About ── */
+.about-panel {
+  flex: 0 0 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(160deg, #141414 0%, #1a1a1a 100%);
+}
+
+.about-inner {
+  max-width: 600px;
+  text-align: center;
+}
+
+.about-title {
+  font-size: 1.6rem;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.about-body {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Bottom half: Posts ── */
+.posts-panel {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-main);
+}
+
+.posts-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.5rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+  align-content: start;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.posts-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.posts-grid::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.posts-empty {
+  color: var(--text-secondary);
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* =========================
+   Post Card (compact)
+========================= */
+
+.post-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 160px; 
+  overflow:hidden
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.post-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-card-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background-color: var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+
+.post-card-date {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.post-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.post-card-preview {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  /* clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.post-card-user {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.post-card-read-more {
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* =========================
+   Post Modal
+========================= */
+
+.post-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: overlay-in 0.2s ease forwards;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.post-modal-card {
+  background: #1C1C1C;
+  border: 1px solid rgba(0, 194, 168, 0.25);
+  border-radius: 16px;
+  padding: 2rem 2.25rem;
+  max-width: 680px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,194,168,0.1);
+  animation: modal-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.post-modal-card::-webkit-scrollbar {
+  width: 4px;
+}
+.post-modal-card::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.post-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-modal-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.post-modal-tag {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background-color: var(--accent-dim);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.post-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  line-height: 1.3;
+  padding-right: 2rem;
+}
+
+.post-modal-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.post-modal-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.25rem 0;
+}
+
+.post-modal-content {
+  font-size: 0.95rem;
+  color: #D0D0D0;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================
+   Tag Bar
+========================= */
+
+.tag-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1.5rem 0;
+  justify-content: flex-start;
+}
+
+.tag-button {
+  background-color: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.tag-button:hover {
+  background-color: var(--accent);
+  color: black;
+}
+
+.active-tag {
+  background-color: var(--accent);
+  color: black;
+}
+
+/* =========================
+   Logo
+========================= */
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  transition: transform 300ms ease, filter 300ms ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 1.5em rgba(0, 194, 168, 0.4));
+}
+
+/* =========================
+   Cards / Sections (About page)
+========================= */
+
+.card, .post-card-legacy, .about-card {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   Text Styles
+========================= */
+
+.custom-text {
+  color: var(--accent);
+}
+
+.read-the-docs {
+  color: var(--text-secondary);
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.custom-button {
+  background-color: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  padding: 8px 16px;
+  font-size: 15px;
+  border-radius: 8px;
+  margin: 2px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.custom-button:hover {
+  background-color: var(--accent);
+  color: black;
+  box-shadow: 0 0 12px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.active-button {
+  background-color: var(--accent);
+  color: black;
+}
+
+.floating-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 56px;
+  height: 56px;
+  font-size: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background-color: var(--bg-secondary);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.floating-button:hover {
+  background-color: var(--accent);
+  color: black;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.custom-select {
+  background-color: #1E1E1E;
+  color: var(--text-primary);
+  border: 1px solid var(--accent);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+/* =========================
+   Form Controls (override Bootstrap white)
+========================= */
+
+.form-control {
+  background-color: #2a2a2a !important;
+  color: var(--text-primary) !important;
+  border: 1px solid #3a3a3a !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+.form-control:focus {
+  background-color: #2a2a2a !important;
+  color: var(--text-primary) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-dim) !important;
+}
+
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 999px #2a2a2a inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+}
+
+.btn-light {
+  background-color: #2a2a2a !important;
+  color: var(--text-primary) !important;
+  border: 1px solid #3a3a3a !important;
+}
+
+.btn-light:hover {
+  background-color: var(--accent) !important;
+  color: black !important;
+  border-color: var(--accent) !important;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 600px) {
+  .split-layout {
+    height: auto;
+    overflow: visible;
+  }
+
+  .about-panel,
+  .posts-panel {
+    flex: none;
+    height: auto;
+  }
+
+  .posts-grid {
+    grid-template-columns: 1fr;
+    max-height: 60vh;
+  }
+
+  .about-panel {
+    min-height: 200px;
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* Tablet: tighten grid */
+@media (max-width: 768px) {
+  .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));;
+    gap: 0.65rem;
+    padding: 0.5rem 1rem 1rem;
+  }
+
+  .header {
+    padding: 0.75rem 1rem;
+  }
+
+  .post-modal-card {
+    padding: 1.5rem;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+
+  .post-modal-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Mobile: stack everything, scrollable */
+@media (max-width: 600px) {
+  /* Header: shrink title, wrap nav */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.6rem !important;
+  }
+
+.header-nav {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.header-nav-links {
+  flex-wrap: wrap;
+}
+
+.header-user {
+  padding-left: 0;
+  border-left: none;
+  width: 100%;
+  justify-content: space-between;
+}
+  .custom-button {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+
+  /* Split layout: unlock fixed height, let it scroll naturally */
+  .split-layout {
+    height: auto;
+    overflow: visible;
+  }
+
+  .about-panel {
+    flex: none;
+    height: auto;
+    min-height: 180px;
+    padding: 1.5rem 1rem;
+  }
+
+  .about-title {
+    font-size: 1.3rem;
+  }
+
+  .about-body {
+    font-size: 0.9rem;
+  }
+
+  .posts-panel {
+    flex: none;
+    height: auto;
+    overflow: visible;
+  }
+
+  .posts-grid {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow: visible;
+    padding: 0.5rem 0.75rem 5rem;
+    gap: 0.65rem;
+  }
+
+  /* Tag bar: scrollable horizontal on mobile */
+  .tag-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0.65rem 0.75rem 0;
+    gap: 0.4rem;
+    scrollbar-width: none;
+  }
+
+  .tag-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tag-button {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.7rem;
+  }
+
+  /* Post cards: slightly more compact */
+  .post-card {
+    padding: 0.85rem 1rem;
+  }
+
+  .post-card-title {
+    font-size: 0.9rem;
+  }
+
+  /* Modal: bottom sheet on mobile */
+  .post-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .post-modal-card {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem 1.25rem;
+    animation: modal-slide-up 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  }
+
+  @keyframes modal-slide-up {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FAB: slightly smaller */
+  .floating-button {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+    bottom: 16px;
+    right: 16px;
+  }
+}
+
+/* =========================
+   Card Media Indicator (pill badge — no overflow)
+========================= */
+
+.post-card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.post-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* Small inline pill shown in the card footer */
+.card-media-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  color: var(--accent);
+  background-color: var(--accent-dim);
+  border: 1px solid rgba(0,194,168,0.25);
+  padding: 0.15rem 0.55rem;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+/* =========================
+   Modal Media
+========================= */
+
+.modal-media-img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  background-color: #111;
+  display: block;
+}
+
+/* Taller 16:9 wrapper — uses full modal width */
+.modal-media-video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: #000;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+.modal-media-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--border);
+}
+
+.header-username {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.logout-button {
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
