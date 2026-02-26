@@ -5,6 +5,7 @@ import NewPost from "./NewPost";
 import "./App.css";
 import API_BASE from "./API";
 
+
 const TRUNCATE_LENGTH = 120;
 
 function getImageUrl(post) {
@@ -224,9 +225,9 @@ const fetchPosts = useCallback(() => {
       )}
 
      {auth.token && (
-  <button className="mobile-logout-btn" onClick={handleLogout} title="Logout">
-    👤
-  </button>
+  <button className="mobile-logout-btn" onClick={handleLogout}>
+  ⏻
+</button>
 )}
 
       {selectedPost && <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />}
