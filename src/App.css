@@ -33,7 +33,7 @@ html, body, #root {
   overflow: hidden;
 }
 
-@media (max-width: 660px) {
+@media (max-width: 1024px) {
   .app-root {
     height: auto;
     overflow: visible;
@@ -523,7 +523,7 @@ html, body, #root {
    Responsive
 ========================= */
 
-@media (max-width: 660px) {
+@media (max-width: 1024px) {
   .split-layout {
     height: auto;
     overflow: visible;
@@ -565,7 +565,7 @@ html, body, #root {
 }
 
 /* Mobile: stack everything, scrollable */
-@media (max-width: 660px) {
+@media (max-width: 1024px) {
   /* Header: title left, nav wraps below with user top-right */
   .header {
     flex-wrap: wrap;
@@ -811,7 +811,7 @@ html, body, #root {
   display: none;
 }
 
-@media (max-width: 660px) {
+@media (max-width: 1024px) {
   .mobile-logout-btn {
     display: flex;
     position: fixed;
@@ -838,7 +838,7 @@ html, body, #root {
   }
 }
 
-@media (max-width: 660px) {
+@media (max-width: 1024px) {
   .header-user {
     display: none !important;
   }
