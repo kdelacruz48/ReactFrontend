@@ -167,7 +167,7 @@ const fetchPosts = useCallback(() => {
  useEffect(() => {
     if (!auth.token) return;
     fetchPosts();
-    const id = setInterval(fetchPosts, 5000);
+    const id = setInterval(fetchPosts, 60000);
     return () => clearInterval(id);
   }, [auth.token, fetchPosts]);
 
