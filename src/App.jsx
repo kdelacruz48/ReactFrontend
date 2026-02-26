@@ -223,6 +223,12 @@ const fetchPosts = useCallback(() => {
         </>
       )}
 
+     {auth.token && (
+  <button className="mobile-logout-btn" onClick={handleLogout} title="Logout">
+    👤
+  </button>
+)}
+
       {selectedPost && <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />}
     </div>
   );

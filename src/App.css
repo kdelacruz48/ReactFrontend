@@ -33,7 +33,7 @@ html, body, #root {
   overflow: hidden;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 660px) {
   .app-root {
     height: auto;
     overflow: visible;
@@ -349,6 +349,7 @@ html, body, #root {
   flex-wrap: wrap;
   padding: 0.75rem 1.5rem 0;
   justify-content: flex-start;
+  margin-bottom: 5px;
 }
 
 .tag-button {
@@ -522,7 +523,7 @@ html, body, #root {
    Responsive
 ========================= */
 
-@media (max-width: 600px) {
+@media (max-width: 660px) {
   .split-layout {
     height: auto;
     overflow: visible;
@@ -564,34 +565,40 @@ html, body, #root {
 }
 
 /* Mobile: stack everything, scrollable */
-@media (max-width: 600px) {
-  /* Header: shrink title, wrap nav */
+@media (max-width: 660px) {
+  /* Header: title left, nav wraps below with user top-right */
   .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
     padding: 0.75rem 1rem;
+    align-items: center;
   }
 
   .header h1 {
-    font-size: 1.6rem !important;
+    font-size: 1.4rem !important;
+    margin: 0;
+    flex-shrink: 0;
   }
 
   .header-nav {
     width: 100%;
     flex-wrap: wrap;
     gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .header-nav-links {
     flex-wrap: wrap;
+    order: 2;
   }
 
   .header-user {
+    display: none;
     padding-left: 0;
     border-left: none;
-    width: 100%;
-    justify-content: space-between;
+    order: 1;
+    margin-left: auto;
   }
 
   .custom-button {
@@ -606,11 +613,11 @@ html, body, #root {
   }
 
   .about-panel {
-    flex: none;
-    height: auto;
-    min-height: 180px;
-    padding: 1.5rem 1rem;
-  }
+  flex: none;
+  height: 35vh;
+  min-height: 35vh;
+  padding: 1.5rem 1rem;
+}
 
   .about-title {
     font-size: 1.3rem;
@@ -794,4 +801,45 @@ html, body, #root {
 .logout-button:hover {
   border-color: var(--text-primary);
   color: var(--text-primary);
+}
+
+/* =========================
+   Mobile Logout Button
+========================= */
+
+.mobile-logout-btn {
+  display: none;
+}
+
+@media (max-width: 660px) {
+  .mobile-logout-btn {
+    display: flex;
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--text-secondary);
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 200;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    transition: all 0.25s ease;
+  }
+
+  .mobile-logout-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+@media (max-width: 660px) {
+  .header-user {
+    display: none !important;
+  }
 }
