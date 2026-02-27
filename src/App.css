@@ -765,13 +765,13 @@ html, body, #root {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: .5rem;
 }
 
 .header-nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .header-user {
@@ -842,4 +842,5 @@ html, body, #root {
   .header-user {
     display: none !important;
   }
+  
 }

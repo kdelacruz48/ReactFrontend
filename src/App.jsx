@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import LoginWrapper from "./LoginWrapper";
+import Login from "./Login";
+import Register from "./Register";
 import NewPost from "./NewPost";
 import "./App.css";
-import API_BASE from "./API";
-
 
 const TRUNCATE_LENGTH = 120;
 
@@ -85,29 +85,29 @@ function PostCard({ post, onClick }) {
 
   return (
     <div className="post-card" onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onClick()}>
-     <div className="post-card-inner">
-  <div className="post-card-text">
-    <div className="post-card-header">
-      <span className="post-card-tag">{post.tag}</span>
-      <span className="post-card-date">{new Date(post.created_date).toLocaleDateString()}</span>
-    </div>
-    <h3 className="post-card-title">{post.title}</h3>
-    <p className="post-card-preview">{preview}</p>
-  </div>
-  <div className="post-card-footer">
-    <span className="post-card-user">{post.userName}</span>
-    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-      {hasMedia && <CardMediaBadge url={getImageUrl(post)} />}
-      {isLong && <span className="post-card-read-more">Read more →</span>}
-    </div>
-  </div>
-</div>
+      <div className="post-card-inner">
+        <div className="post-card-text">
+          <div className="post-card-header">
+            <span className="post-card-tag">{post.tag}</span>
+            <span className="post-card-date">{new Date(post.created_date).toLocaleDateString()}</span>
+          </div>
+          <h3 className="post-card-title">{post.title}</h3>
+          <p className="post-card-preview">{preview}</p>
+          <div className="post-card-footer">
+            <span className="post-card-user">{post.userName}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              {hasMedia && <CardMediaBadge url={getImageUrl(post)} />}
+              {isLong && <span className="post-card-read-more">Read more →</span>}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
 function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
- const tags = [...new Set(posts.map((p) => p.tag))].sort();
+  const tags = [...new Set(posts.map((p) => p.tag))];
   const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).reverse();
 
   return (
@@ -149,31 +149,45 @@ export default function App() {
   const [view, setView] = useState("about");
   const [filterTag, setFilterTag] = useState("");
   const [selectedPost, setSelectedPost] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const handleLogout = () => {
     setAuth({ token: null, username: null, role: null });
     setPosts([]);
     setView("about");
+    setShowAuthModal(false);
+    setShowRegister(false);
   };
 
-const fetchPosts = useCallback(() => {
+  const handleFloatingButtonClick = () => {
+    if (auth.token) {
+      handleLogout();
+    } else {
+      setShowRegister(false);
+      setShowAuthModal(true);
+    }
+  };
+
+  const fetchPosts = () => {
+    if (!auth.token) return;
     axios
-      .get(`${API_BASE}/api/BlogAPI`, {
+      .get("https://blogapi-production-97d7.up.railway.app/api/BlogAPI", {
         headers: { Authorization: `Bearer ${auth.token}` },
       })
       .then((res) => setPosts(res.data.result))
       .catch((err) => console.error("Error fetching posts:", err));
-  }, [auth.token]);
+  };
 
- useEffect(() => {
+  useEffect(() => {
     if (!auth.token) return;
     fetchPosts();
-    const id = setInterval(fetchPosts, 60000);
+    const id = setInterval(fetchPosts, 5000);
     return () => clearInterval(id);
-  }, [auth.token, fetchPosts]);
+  }, [auth.token]);
 
   if (!auth.token && view === "posts")
-    return <LoginWrapper onLogin={(token, username, role) => setAuth({ token, username, role })} />;
+    return <LoginWrapper onLogin={(token, username, role) => { setAuth({ token, username, role }); setView("posts"); }} />;
 
   return (
     <div className="app-root">
@@ -181,25 +195,39 @@ const fetchPosts = useCallback(() => {
         <h1 className="custom-text m-0">Kyle's Island</h1>
 
         <nav className="header-nav">
-          {/* Main nav links */}
           <div className="header-nav-links">
             <button className={`custom-button ${view === "about" ? "active-button" : ""}`} onClick={() => setView("about")}>About Me</button>
+            <button className={`custom-button ${view === "projects" ? "active-button" : ""}`} onClick={() => setView("projects")}>Projects</button>
             <button className={`custom-button ${view === "posts" ? "active-button" : ""}`} onClick={() => setView("posts")}>Posts</button>
-            <a href="https://github.com/kdelacruz48" target="_blank" rel="noreferrer" className="custom-button" style={{ textDecoration: "none", display: "inline-block" }}>GitHub</a>
-            <a href="https://www.linkedin.com/in/k-delacruz/" target="_blank" rel="noreferrer" className="custom-button" style={{ textDecoration: "none", display: "inline-block" }}>LinkedIn</a>
+            <button className={`custom-button ${view === "contact" ? "active-button" : ""}`} onClick={() => setView("contact")}>Contact</button>
           </div>
 
-          {/* User section — only when logged in */}
-          {auth.token && (
-            <div className="header-user">
-              <span className="header-username">{auth.username}</span>
-              <button className="logout-button" onClick={handleLogout}>Logout</button>
-            </div>
-          )}
+          {/* Power button — always top right */}
+          <button
+            title={auth.token ? `Logout (${auth.username})` : "Login"}
+            onClick={handleFloatingButtonClick}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              border: `2px solid ${auth.token ? "var(--accent)" : "var(--text-secondary)"}`,
+              background: auth.token ? "var(--accent-dim)" : "transparent",
+              color: auth.token ? "var(--accent)" : "var(--text-secondary)",
+              fontSize: 18,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "all 0.2s ease",
+              flexShrink: 0,
+            }}
+          >
+            ⏻
+          </button>
         </nav>
       </header>
 
-      {view === "about" ? (
+      {view === "about" && (
         <div className="container p-4">
           <div className="card about-card">
             <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>About Me</h2>
@@ -208,14 +236,41 @@ const fetchPosts = useCallback(() => {
             <p>More info, hobbies, or links could go here!</p>
           </div>
         </div>
-      ) : (
+      )}
+
+      {view === "projects" && (
+        <div className="container p-4">
+          <div className="card about-card">
+            <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>Projects</h2>
+            <p>This is where my projects will go. Check back soon!</p>
+          </div>
+        </div>
+      )}
+
+      {view === "contact" && (
+        <div className="container p-4">
+          <div className="card about-card">
+            <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>Contact</h2>
+            <p>Feel free to reach out! You can find me on the following platforms:</p>
+            <p>
+              <a href="https://github.com/kdelacruz48" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a>
+            </p>
+            <p>
+              <a href="https://www.linkedin.com/in/k-delacruz/" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>LinkedIn</a>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {view === "posts" && (
         <div className="split-layout">
           <AboutPanel />
           <PostsPanel posts={posts} filterTag={filterTag} onFilterChange={setFilterTag} onSelect={setSelectedPost} />
         </div>
       )}
 
-      {view === "posts" && (
+      {/* New post button — posts view only */}
+      {view === "posts" && auth.token && (
         <>
           <button className="floating-button" onClick={() => setShowNewPost(true)}>+</button>
           {showNewPost && (
@@ -224,29 +279,49 @@ const fetchPosts = useCallback(() => {
         </>
       )}
 
-     {auth.token && (
-  <button className="mobile-logout-btn" onClick={handleLogout}>
-  <span style={{
-    display: "block",
-    width: "14px",
-    height: "14px",
-    borderRadius: "50%",
-    border: "2px solid var(--accent)",
-    borderTopColor: "transparent",
-    position: "relative",
-  }}>
-    <span style={{
-      position: "absolute",
-      top: "-5px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "2px",
-      height: "8px",
-      backgroundColor: "var(--accent)",
-    }} />
-  </span>
-</button>
-)}
+      {/* Login/Register modal — clean, no blurred background wrapper */}
+      {showAuthModal && !auth.token && (
+        <div className="post-modal-overlay" onClick={() => setShowAuthModal(false)}>
+          <div className="post-modal-card" style={{ maxWidth: 400 }} onClick={(e) => e.stopPropagation()}>
+            <button className="post-modal-close" onClick={() => setShowAuthModal(false)}>✕</button>
+            {showRegister ? (
+              <Register
+                onRegister={() => setShowRegister(false)}
+                onSwitchToLogin={() => setShowRegister(false)}
+              />
+            ) : (
+              <Login
+                onLogin={(token, username, role) => {
+                  setAuth({ token, username, role });
+                  setShowAuthModal(false);
+                }}
+                onSwitchToRegister={() => setShowRegister(true)}
+              />
+            )}
+            <div style={{ marginTop: "0.75rem" }}>
+              <button
+                className="custom-button"
+                style={{ width: "100%" }}
+                onClick={async () => {
+                  try {
+                    const res = await fetch("https://blogapi-production-97d7.up.railway.app/api/UserAuth/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ username: "Guest", password: "Guest" }),
+                    });
+                    if (!res.ok) throw new Error();
+                    const data = await res.json();
+                    setAuth({ token: data.result.token, username: data.result.user.userName, role: data.result.user.role });
+                    setShowAuthModal(false);
+                  } catch { console.error("Guest login failed"); }
+                }}
+              >
+                Continue as Guest
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedPost && <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />}
     </div>
