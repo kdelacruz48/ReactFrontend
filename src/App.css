@@ -582,8 +582,8 @@ html, body, #root {
 
   .header-nav {
     width: 100%;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    /*flex-wrap: wrap;*/
+    gap: 0.4rem;
     align-items: center;
     justify-content: space-between;
   }
