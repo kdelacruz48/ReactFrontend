@@ -108,7 +108,7 @@ function PostCard({ post, onClick }) {
 
 function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
   const tags = [...new Set(posts.map((p) => p.tag))];
-  const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).reverse();
+  const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
   return (
     <div className="posts-panel">
