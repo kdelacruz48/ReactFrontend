@@ -69,12 +69,10 @@ html, body, #root {
 
 /* ── Top half: About ── */
 .about-panel {
-  flex: 0 0 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  border-bottom: 1px solid var(--border);
+    flex: 0 0 50%;
+  overflow: hidden;
+  padding: 0;
+  display: block;
   background: linear-gradient(160deg, #141414 0%, #1a1a1a 100%);
 }
 
@@ -843,4 +841,17 @@ html, body, #root {
     display: none !important;
   }
   
+}
+
+.about-panel {
+  flex: 0 0 50%;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-img {
+  display: block;
 }

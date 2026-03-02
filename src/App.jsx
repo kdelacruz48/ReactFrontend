@@ -5,6 +5,7 @@ import Login from "./Login";
 import Register from "./Register";
 import NewPost from "./NewPost";
 import "./App.css";
+import myImg from "./assets/tilesforsite.png";
 
 const TRUNCATE_LENGTH = 120;
 
@@ -133,15 +134,10 @@ function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
 function AboutPanel() {
   return (
     <div className="about-panel">
-      <div className="about-inner">
-        <h2 className="about-title">About Me</h2>
-        <p className="about-body">Hello! I'm Kyle. This is my personal blog where I share posts about general topics. I enjoy coding, building small projects, and sharing my experiences.</p>
-        <p className="about-body">More info, hobbies, or links could go here!</p>
-      </div>
+      <img src={myImg} alt="Kyle's Island" className="about-img" />
     </div>
   );
 }
-
 function PowerIcon() {
   return (
     <span style={{
@@ -207,7 +203,7 @@ export default function App() {
   useEffect(() => {
     if (!auth.token) return;
     fetchPosts();
-    const id = setInterval(fetchPosts, 5000);
+    const id = setInterval(fetchPosts, 50000);
     return () => clearInterval(id);
   }, [auth.token]);
 
