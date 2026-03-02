@@ -5,7 +5,7 @@ import Login from "./Login";
 import Register from "./Register";
 import NewPost from "./NewPost";
 import "./App.css";
-import myImg from "./assets/tilesforsite.png";
+import myImg from "./assets/tilesForSite.png";
 
 const TRUNCATE_LENGTH = 120;
 
