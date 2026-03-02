@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
-import API_BASE from "./API";
 
 // Static fake data — always looks great, no loading flash
 const FAKE_POSTS = [
@@ -43,7 +42,7 @@ function MockBackground() {
       <div className="header">
         <h1 className="custom-text m-0">Kyle's Island</h1>
         <div>
-          {["About Me", "Posts"].map((label) => (
+          {["Professional", "Personal"].map((label) => (
             <button key={label} className="custom-button" style={{ pointerEvents: "none" }}>{label}</button>
           ))}
         </div>
@@ -58,20 +57,42 @@ function MockBackground() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "2rem",
+          padding: "1.75rem 2rem",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           background: "linear-gradient(160deg, #141414 0%, #1a1a1a 100%)",
         }}>
-          <div style={{ maxWidth: 600, textAlign: "center" }}>
-            <h2 style={{ color: "var(--accent)", fontSize: "1.6rem", marginBottom: "0.75rem", letterSpacing: "0.05em" }}>
-              About Me
-            </h2>
-            <p style={{ color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: "0.5rem" }}>
-              Hello! I'm Kyle. This is my personal blog where I share posts about general topics.
-            </p>
-            <p style={{ color: "var(--text-secondary)", lineHeight: 1.7 }}>
-              I enjoy coding, building small projects, and sharing my experiences.
-            </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "2rem", maxWidth: "720px", width: "100%" }}>
+
+            {/* Avatar */}
+            <div style={{
+              width: 72, height: 72, flexShrink: 0,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #00C2A8 0%, #006e60 100%)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "1.8rem", fontWeight: 700, color: "#0F0F0F",
+              boxShadow: "0 0 24px rgba(0,194,168,0.3)",
+            }}>K</div>
+
+            {/* Text */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.3rem" }}>
+                <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 700, color: "#EAEAEA" }}>Kyle De La Cruz</h2>
+                <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "#00C2A8", letterSpacing: "0.08em" }}>Full-Stack Dev</span>
+              </div>
+              <p style={{ margin: "0 0 0.85rem", fontSize: "0.83rem", color: "#A0A0A0", lineHeight: 1.65 }}>
+                By day I write code, by night I'm painting or performing on the street.
+                This is the personal side — thoughts, interests, and whatever I feel like sharing.
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                {["💻 Coding", "🎨 Painting", "🎭 Street Performance", "🎵 Music", "📖 Reading"].map(chip => (
+                  <span key={chip} style={{
+                    fontSize: "0.72rem", padding: "0.2rem 0.65rem", borderRadius: "20px",
+                    background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.2)", color: "#A0A0A0",
+                  }}>{chip}</span>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -107,7 +128,7 @@ export default function LoginWrapper({ onLogin }) {
   const handleGuestLogin = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/UserAuth/login`,
+        "https://blogapi-production-97d7.up.railway.app/api/UserAuth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
