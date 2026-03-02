@@ -43,7 +43,7 @@ function MockBackground() {
       <div className="header">
         <h1 className="custom-text m-0">Kyle's Island</h1>
         <div>
-          {["About Me", "Posts", "GitHub", "LinkedIn"].map((label) => (
+          {["About Me", "Posts"].map((label) => (
             <button key={label} className="custom-button" style={{ pointerEvents: "none" }}>{label}</button>
           ))}
         </div>

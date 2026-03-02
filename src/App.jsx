@@ -4,8 +4,9 @@ import LoginWrapper from "./LoginWrapper";
 import Login from "./Login";
 import Register from "./Register";
 import NewPost from "./NewPost";
+import About from "./AboutMe.jsx";
 import "./App.css";
-import myImg from "./assets/tilesForSite.png";
+
 
 const TRUNCATE_LENGTH = 120;
 
@@ -133,11 +134,43 @@ function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
 
 function AboutPanel() {
   return (
-    <div className="about-panel">
-      <img src={myImg} alt="Kyle's Island" className="about-img" />
+    <div className="about-panel" style={{ padding: "1.75rem 2rem" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "2rem", maxWidth: "720px", width: "100%" }}>
+
+        <div style={{
+          width: 72, height: 72, flexShrink: 0,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #00C2A8 0%, #006e60 100%)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: "1.8rem", fontWeight: 700, color: "#0F0F0F",
+          boxShadow: "0 0 24px rgba(0,194,168,0.3)",
+        }}>K</div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.3rem" }}>
+            <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 700, color: "#EAEAEA" }}>Kyle Delacruz</h2>
+            <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "#00C2A8", letterSpacing: "0.08em" }}>Full-Stack Dev</span>
+          </div>
+          <p style={{ margin: "0 0 0.85rem", fontSize: "0.83rem", color: "#A0A0A0", lineHeight: 1.65 }}>
+            I build web apps, tinker with side projects, and write about what's on my mind.
+            This is the personal side — thoughts, interests, and whatever I feel like sharing.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+            {["💻 Coding", "🎵 Music", "🎮 Gaming", "🌿 Outdoors", "📖 Reading"].map(chip => (
+              <span key={chip} style={{
+                fontSize: "0.72rem", padding: "0.2rem 0.65rem", borderRadius: "20px",
+                background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.2)", color: "#A0A0A0",
+              }}>{chip}</span>
+            ))}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
+
+
 function PowerIcon() {
   return (
     <span style={{
@@ -217,10 +250,8 @@ export default function App() {
 
         <nav className="header-nav">
           <div className="header-nav-links">
-            <button className={`custom-button ${view === "about" ? "active-button" : ""}`} onClick={() => setView("about")}>About Me</button>
-            <button className={`custom-button ${view === "projects" ? "active-button" : ""}`} onClick={() => setView("projects")}>Projects</button>
-            <button className={`custom-button ${view === "posts" ? "active-button" : ""}`} onClick={() => setView("posts")}>Posts</button>
-            <button className={`custom-button ${view === "contact" ? "active-button" : ""}`} onClick={() => setView("contact")}>Contact</button>
+            <button className={`custom-button ${view === "about" ? "active-button" : ""}`} onClick={() => setView("about")}>Professional</button>
+            <button className={`custom-button ${view === "posts" ? "active-button" : ""}`} onClick={() => setView("posts")}>Personal</button>
           </div>
 
           {/* Power button — pure CSS icon, no unicode */}
@@ -247,40 +278,8 @@ export default function App() {
         </nav>
       </header>
 
-      {view === "about" && (
-        <div className="container p-4">
-          <div className="card about-card">
-            <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>About Me</h2>
-            <p>Hello! I'm Kyle. This is my personal blog where I share posts about general topics.</p>
-            <p>I enjoy coding, building small projects, and sharing my experiences.</p>
-            <p>More info, hobbies, or links could go here!</p>
-          </div>
-        </div>
-      )}
+      {view === "about" && <About />}
 
-      {view === "projects" && (
-        <div className="container p-4">
-          <div className="card about-card">
-            <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>Projects</h2>
-            <p>This is where my projects will go. Check back soon!</p>
-          </div>
-        </div>
-      )}
-
-      {view === "contact" && (
-        <div className="container p-4">
-          <div className="card about-card">
-            <h2 className="subtitle text-accept mb-3" style={{ textAlign: "center" }}>Contact</h2>
-            <p>Feel free to reach out! You can find me on the following platforms:</p>
-            <p>
-              <a href="https://github.com/kdelacruz48" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>GitHub</a>
-            </p>
-            <p>
-              <a href="https://www.linkedin.com/in/k-delacruz/" target="_blank" rel="noreferrer" style={{ color: "var(--accent)" }}>LinkedIn</a>
-            </p>
-          </div>
-        </div>
-      )}
 
       {view === "posts" && (
         <div className="split-layout">
