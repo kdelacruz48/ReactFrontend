@@ -3,50 +3,59 @@ import { useEffect, useRef, useState } from "react";
 // ─── Sample Data ───────────────────────────────────────────────────────────────
 
 const SKILLS = [
-  { label: "React", level: 90 },
-  { label: "JavaScript", level: 88 },
-  { label: "C# / .NET", level: 80 },
-  { label: "SQL", level: 72 },
-  { label: "CSS / Tailwind", level: 85 },
-  { label: "Node.js", level: 65 },
+  { label: "C# / .NET", level: 90 },
+  { label: "Systems Architecture", level: 85 },
+  { label: "JavaScript", level: 80 },
+  { label: "SQL", level: 80 }, 
+  { label: "HTML/CCS", level: 75},
+  { label: "React", level: 50 },
 ];
 
 const PROJECTS = [
   {
-    name: "CLI Todo App",
-    desc: "A dead-simple terminal-based todo list — no cloud, no accounts, just fast local task tracking.",
-    tags: ["Node.js", "CLI"],
+    name: "Blog Frontend",
+    desc: "A dark, responsive React app with auth, tag filtering, post modals, and media embeds. Designed and built from scratch — no templates.",
+    tags: ["React", "JavaScript", "CSS"],
     href: "https://github.com/kdelacruz48",
     implementation: [
-      "Built with Node.js and a plain JSON file as the data store — no database needed.",
-      "Commands parsed with a lightweight argv handler; no external CLI frameworks.",
+      "Built with React and a custom CSS design system using CSS variables for the full dark theme.",
+      "JWT auth, guest access, and a frosted-glass login screen that previews the real app.",
+    ],
+    improvements: [
+      "Add a rich text editor so posts support markdown or formatted content.",
+      "Introduce pagination or infinite scroll as the post count grows.",
     ],
   },
   {
-    name: "Portfolio Site",
-    desc: "Minimal dark portfolio showcasing my work, skills, and writing. Designed from scratch, no templates.",
-    tags: ["HTML", "CSS", "JS"],
+    name: "Blog API",
+    desc: "A containerized RESTful .NET Web API powering the blog — handling auth, post management, and role-based access control.",
+    tags: ["C#", ".NET", "SQL Server", "Railway"],
     href: "https://github.com/kdelacruz48",
     implementation: [
-      "Pure HTML/CSS/JS — zero build step, zero dependencies, loads instantly.",
-      "Dark theme implemented with CSS custom properties for easy future retheming.",
+      "ASP.NET Core Web API with JWT authentication and role-based authorization for admin actions.",
+      "PostgreSQL Server database with Entity Framework Core, deployed alongside the API on Railway.",
+    ],
+    improvements: [
+      "Add an image upload endpoint so media is hosted directly rather than relying on external URLs.",
+      "Implement rate limiting and request logging for better observability in production.",
     ],
   },
 ];
 
 const BLOG_IMPLEMENTATION = [
   { label: "Frontend", value: "React + Vite, custom CSS with dark theme variables" },
-  { label: "Backend", value: "ASP.NET Core Web API with JWT authentication" },
-  { label: "Database", value: "SQL Server — posts, users, and roles" },
+  { label: "Backend", value: "Containerized ASP.NET Core API with JWT authentication" },
+  { label: "Database", value: "PostgreSQL — posts, users, and roles" },
   { label: "Auth", value: "Role-based: Admin can create posts, Guest can read" },
-  { label: "Hosting", value: "API deployed on Railway; frontend on Vercel" },
-  { label: "Media", value: "Image URLs + embedded YouTube/Vimeo via iframe" },
+  { label: "Hosting", value: "React · .NET · PostgreSQL- Deployed on Railway" },
+  { label: "Media", value: "Image URLs + embedded videos" },
 ];
 
 const TIMELINE = [
-  { year: "2023", text: "Started learning full-stack development with React and .NET." },
-  { year: "2024", text: "Shipped my first production web app and began freelancing." },
-  { year: "2025", text: "Built this blog. Currently exploring TypeScript and cloud infra." },
+  { year: "2019", text: "Made it official — started a Software Systems degree." },
+  { year: "2021", text: "Graduated and jumped straight into production engineering. Learned fast." },
+  { year: "2023", text: "Promoted to Systems Engineer. Took on architecture and bigger system-level problems." },
+  { year: "2025", text: "Senior Systems Engineer. Still learning. Still shipping." },
 ];
 
 const LINKS = [
@@ -56,11 +65,19 @@ const LINKS = [
 ];
 
 const WHATS_NEXT = [
-  { icon: "⚙️", text: "Migrate the blog API to TypeScript + Bun for faster cold starts" },
-  { icon: "🔍", text: "Add full-text search across posts" },
-  { icon: "💬", text: "Comments system — probably with a lightweight serverless function" },
-  { icon: "🌐", text: "Explore containerizing the API with Docker + Railway deploy hooks" },
-  { icon: "📝", text: "Write more — aiming for at least one post per week" },
+  { icon: "✍️", text: "Write more — the blog exists, now it needs posts" },
+  { icon: "🖼️", text: "Add an image upload endpoint so posts aren't dependent on external URLs" },
+  { icon: "🔒", text: "Rate limiting and request logging — the API is live and needs better observability" },
+  { icon: "📄", text: "Rich text editor so posts can support formatted content, not just plain text" },
+  { icon: "🔍", text: "Full-text search across posts — it'll matter once there are enough of them" },
+];
+
+
+const CURRENTLY = [
+  { icon: "📖", label: "Reading",   value: "The Pragmatic Programmer" },
+  { icon: "🎵", label: "Listening", value: "Motion City Soundtrack" },
+  { icon: "🔨", label: "Building",  value: "This blog + A better future" },
+  { icon: "📍", label: "Based in",  value: "United States" },
 ];
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
@@ -123,28 +140,45 @@ function ProjectCard({ project }) {
         <span style={{ fontWeight: 700, fontSize: "0.95rem", color: "#EAEAEA" }}>{project.name}</span>
         <span style={{ fontSize: "0.85rem", color: "#00C2A8", opacity: hovered ? 1 : 0.4, transition: "opacity 0.2s" }}>↗</span>
       </div>
+
       <p style={{ fontSize: "0.82rem", color: "#A0A0A0", lineHeight: 1.6, margin: "0 0 0.85rem" }}>{project.desc}</p>
 
-      {/* Implementation details */}
+      {/* How it's built */}
       <div style={{
-        background: "rgba(0,194,168,0.04)",
-        border: "1px solid rgba(0,194,168,0.1)",
-        borderRadius: "8px",
-        padding: "0.65rem 0.85rem",
-        marginBottom: "0.85rem",
-      }}>
-        <span style={{ fontSize: "0.68rem", color: "#00C2A8", fontFamily: "monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          How it's built
-        </span>
-        <ul style={{ margin: "0.4rem 0 0", padding: "0 0 0 1rem" }}>
-          {project.implementation.map((point, i) => (
-            <li key={i} style={{ fontSize: "0.79rem", color: "#A0A0A0", lineHeight: 1.6, marginBottom: i < project.implementation.length - 1 ? "0.25rem" : 0 }}>
-              {point}
-            </li>
-          ))}
-        </ul>
-      </div>
+  background: "rgba(0,194,168,0.04)",
+  border: "1px solid rgba(0,194,168,0.1)",
+  borderRadius: "8px",
+  padding: "0.65rem 0.85rem",
+  marginBottom: "0.85rem",
+}}>
+  <span style={{ fontSize: "0.68rem", color: "#00C2A8", fontFamily: "monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+    How it's built
+  </span>
+  <ul style={{ margin: "0.4rem 0 0.75rem", padding: "0 0 0 1rem" }}>
+    {project.implementation.map((point, i) => (
+      <li key={i} style={{ fontSize: "0.79rem", color: "#A0A0A0", lineHeight: 1.6, marginBottom: i < project.implementation.length - 1 ? "0.25rem" : 0 }}>
+        {point}
+      </li>
+    ))}
+  </ul>
 
+  {project.improvements && (
+    <>
+      <span style={{ fontSize: "0.68rem", color: "#00C2A8", fontFamily: "monospace", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        What's next
+      </span>
+      <ul style={{ margin: "0.4rem 0 0", padding: "0 0 0 1rem" }}>
+        {project.improvements.map((point, i) => (
+          <li key={i} style={{ fontSize: "0.79rem", color: "#A0A0A0", lineHeight: 1.6, marginBottom: i < project.improvements.length - 1 ? "0.25rem" : 0 }}>
+            {point}
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+</div>
+
+      {/* Tags */}
       <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
         {project.tags.map(t => (
           <span key={t} style={{
@@ -223,15 +257,15 @@ export default function AboutMe() {
           Kyle Delacruz
         </h1>
         <p style={{ fontSize: "1rem", color: "#00C2A8", margin: "0 0 1rem", letterSpacing: "0.08em", fontFamily: "monospace" }}>
-          Full-Stack Developer · Builder · Writer
+          Engineer · Full-Stack Developer · Craftsman
         </p>
         <p style={{ fontSize: "1rem", color: "#A0A0A0", lineHeight: 1.75, maxWidth: "600px", margin: "0 auto 1.5rem" }}>
-          I build things for the web — clean UIs, reliable APIs, and occasionally useful CLI tools. I write about what I learn here.
+          I build things for the web — clean UIs, reliable APIs, and systems that hold everything together. I write about what I learn here.
         </p>
         <div style={{ display: "flex", gap: "0.6rem", justifyContent: "center", flexWrap: "wrap" }}>
           {LINKS.map(link => (
             <a key={link.label} href={link.href} target="_blank" rel="noreferrer" style={{
-              display: "inline-flex", alignItems: "center", gap: "0.4rem",
+              display: "inline-flex", alignItems: "center", gap: "0.0rem",
               padding: "0.4rem 1rem",
               border: "1px solid rgba(0,194,168,0.35)",
               borderRadius: "20px",
@@ -318,37 +352,32 @@ export default function AboutMe() {
             ))}
           </Section>
 
-          <Section title="Currently">
-            <div style={{
-              background: "#1e1e1e",
-              border: "1px solid rgba(255,255,255,0.07)",
-              borderRadius: "12px",
-              padding: "1.1rem 1.3rem",
-            }}>
-              {[
-                { icon: "📖", label: "Reading", value: "The Pragmatic Programmer" },
-                { icon: "🎵", label: "Listening", value: "Explosions in the Sky" },
-                { icon: "🔨", label: "Building", value: "This blog + TypeScript deep dive" },
-                { icon: "📍", label: "Based in", value: "United States" },
-              ].map((row, i, arr) => (
-                <div key={row.label} style={{
-                  display: "flex", alignItems: "baseline", gap: "0.6rem",
-                  padding: "0.5rem 0",
-                  borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
-                  fontSize: "0.85rem",
-                }}>
-                  <span>{row.icon}</span>
-                  <span style={{ color: "#A0A0A0", minWidth: "72px" }}>{row.label}</span>
-                  <span style={{ color: "#EAEAEA" }}>{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </Section>
+         <Section title="Currently">
+  <div style={{
+    background: "#1e1e1e",
+    border: "1px solid rgba(255,255,255,0.07)",
+    borderRadius: "12px",
+    padding: "1.1rem 1.3rem",
+  }}>
+    {CURRENTLY.map((row, i, arr) => (
+      <div key={row.label} style={{
+        display: "flex", alignItems: "baseline", gap: "0.6rem",
+        padding: "0.5rem 0",
+        borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+        fontSize: "0.85rem",
+      }}>
+        <span>{row.icon}</span>
+        <span style={{ color: "#A0A0A0", minWidth: "72px" }}>{row.label}</span>
+        <span style={{ color: "#EAEAEA" }}>{row.value}</span>
+      </div>
+    ))}
+  </div>
+</Section>
         </div>
 
         {/* Right col */}
         <div>
-          <Section title="Other Projects">
+          <Section title="Projects">
             <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
               {PROJECTS.map(p => <ProjectCard key={p.name} project={p} />)}
             </div>

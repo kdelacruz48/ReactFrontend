@@ -855,3 +855,26 @@ html, body, #root {
 .about-img {
   display: block;
 }
+
+
+@media (max-width: 430px) {
+  /* Tighten overall padding */
+  div[style*="padding: 3rem 1.5rem"] {
+    padding: 1.5rem 0.75rem 3rem !important;
+  }
+
+  /* Hero */
+  h1 {
+    font-size: 1.8rem !important;
+  }
+
+  /* Two-column grid: force single column */
+  div[style*="minmax(380px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Blog implementation grid */
+  div[style*="minmax(260px"] {
+    grid-template-columns: 1fr !important;
+  }
+}

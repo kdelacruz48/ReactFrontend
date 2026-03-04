@@ -8,7 +8,7 @@ export default function NewPost({ token, username, role, onClose, onPostCreated 
   const [tag, setTag] = useState("General");
   const [loading, setLoading] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
-  const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Projects", "Tech"];
+  const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Projects", "Tech", "Kira"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
