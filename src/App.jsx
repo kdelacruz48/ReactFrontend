@@ -109,7 +109,11 @@ function PostCard({ post, onClick }) {
 }
 
 function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
-  const tags = [...new Set(posts.map((p) => p.tag))];
+  const tags = [...new Set(posts.map((p) => p.tag))].sort((a, b) => {
+  if (a === "General") return -1;
+  if (b === "General") return 1;
+  return a.localeCompare(b);
+});
   const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
   return (
