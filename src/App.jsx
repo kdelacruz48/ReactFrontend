@@ -19,6 +19,7 @@ function getMediaType(url) {
   const clean = url.split("?")[0].toLowerCase();
   if (/youtube\.com|youtu\.be/.test(url)) return "youtube";
   if (/vimeo\.com/.test(url)) return "vimeo";
+  if (/res\.cloudinary\.com.*\/video\//.test(url)) return "video";
   if (/\.(mp4|webm|ogg)$/.test(clean)) return "video";
   if (/\.(jpg|jpeg|png|gif|webp|svg|avif)$/.test(clean)) return "image";
   return "image";
