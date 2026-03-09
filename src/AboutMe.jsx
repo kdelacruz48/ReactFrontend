@@ -16,12 +16,13 @@ const PROJECTS = [
     name: "Blog Frontend",
     desc: "A dark, responsive React app with auth, tag filtering, post modals, and media embeds. Designed and built from scratch — no templates.",
     tags: ["React", "JavaScript", "CSS"],
-    href: "https://github.com/kdelacruz48",
+    href: "https://github.com/kdelacruz48/ReactFrontend",
     implementation: [
       "Built with React and a custom CSS design system using CSS variables for the full dark theme.",
       "JWT auth, guest access, and a frosted-glass login screen that previews the real app.",
     ],
     improvements: [
+      "Implement the rest of the CRUD operations so posts can be edited and deleted, not just created. Endpoints already exist in the API, just need to be wired up on the frontend.",
       "Add a rich text editor so posts support markdown or formatted content.",
       "Introduce pagination or infinite scroll as the post count grows.",
     ],
@@ -30,7 +31,7 @@ const PROJECTS = [
     name: "Blog API",
     desc: "A containerized RESTful .NET Web API powering the blog — handling auth, post management, and role-based access control.",
     tags: ["C#", ".NET", "SQL Server", "Railway"],
-    href: "https://github.com/kdelacruz48",
+    href: "https://github.com/kdelacruz48/BlogAPI",
     implementation: [
       "ASP.NET Core Web API with JWT authentication and role-based authorization for admin actions.",
       "PostgreSQL Server database with Entity Framework Core, deployed alongside the API on Railway.",

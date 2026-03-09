@@ -6,9 +6,10 @@ import Register from "./Register";
 import NewPost from "./NewPost";
 import About from "./AboutMe.jsx";
 import "./App.css";
-
+import API_BASE from "./API";
 
 const TRUNCATE_LENGTH = 120;
+const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Projects", "Tech", "Kira"];
 
 function getImageUrl(post) {
   return post.imageUrl;
@@ -59,23 +60,160 @@ function ModalMedia({ url }) {
   return null;
 }
 
-function PostModal({ post, onClose }) {
+function PostModal({ post, onClose, auth, onPostDeleted, onPostEdited }) {
+  const [mode, setMode] = useState("view");
+  const [editData, setEditData] = useState({
+    title: post.title,
+    post: post.post,
+    imageUrl: post.imageUrl || "",
+    tag: post.tag,
+  });
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
+  const isAdmin = auth?.role === "Admin";
+
   useEffect(() => {
-    const handleKey = (e) => e.key === "Escape" && onClose();
+    const handleKey = (e) => {
+      if (e.key === "Escape") {
+        if (mode !== "view") setMode("view");
+        else onClose();
+      }
+    };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
+  }, [onClose, mode]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      await axios.put(
+        `${API_BASE}/api/BlogAPI/${post.id}`,
+        {
+          id: post.id,
+          userName: post.userName,
+          title: editData.title,
+          post: editData.post,
+          imageUrl: editData.imageUrl,
+          tag: editData.tag,
+          created_date: post.created_date,
+        },
+        { headers: { Authorization: `Bearer ${auth.token}` } }
+      );
+      // Update local state directly — no re-fetch
+      onPostEdited({
+        ...post,
+        title: editData.title,
+        post: editData.post,
+        imageUrl: editData.imageUrl,
+        tag: editData.tag,
+      });
+    } catch (err) {
+      console.error("Edit failed", err);
+      setError("Failed to save changes. Please try again.");
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setError("");
+    try {
+      await axios.delete(`${API_BASE}/api/BlogAPI/${post.id}`, {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+      // Remove from local state directly — no re-fetch
+      onPostDeleted(post.id);
+    } catch (err) {
+      console.error("Delete failed", err);
+      setError("Failed to delete post. Please try again.");
+      setDeleting(false);
+    }
+  };
+
+  const inputStyle = {
+    backgroundColor: "#2a2a2a",
+    color: "var(--text-primary)",
+    border: "1px solid #3a3a3a",
+    borderRadius: "8px",
+    padding: "0.5rem 0.75rem",
+    width: "100%",
+    outline: "none",
+    marginBottom: "0.75rem",
+    fontSize: "0.92rem",
+    boxSizing: "border-box",
+  };
 
   return (
-    <div className="post-modal-overlay" onClick={onClose}>
+    <div className="post-modal-overlay" onClick={mode === "view" ? onClose : undefined}>
       <div className="post-modal-card" onClick={(e) => e.stopPropagation()}>
         <button className="post-modal-close" onClick={onClose}>✕</button>
-        <span className="post-modal-tag">{post.tag}</span>
-        <h2 className="post-modal-title">{post.title}</h2>
-        <p className="post-modal-meta">{post.userName} · {new Date(post.created_date).toLocaleDateString()}</p>
-        <div className="post-modal-divider" />
-        {getImageUrl(post) && <ModalMedia url={getImageUrl(post)} />}
-        <p className="post-modal-content">{post.post}</p>
+
+        {mode === "view" && (
+          <>
+            <span className="post-modal-tag">{post.tag}</span>
+            <h2 className="post-modal-title">{post.title}</h2>
+            <p className="post-modal-meta">{post.userName} · {new Date(post.updated_date).toLocaleDateString()}</p>
+            <div className="post-modal-divider" />
+            {getImageUrl(post) && <ModalMedia url={getImageUrl(post)} />}
+            <p className="post-modal-content">{post.post}</p>
+
+            {isAdmin && (
+              <div style={{ display: "flex", gap: "0.6rem", marginTop: "1.5rem", justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => setMode("edit")}
+                  style={{ background: "rgba(0,194,168,0.1)", border: "1px solid rgba(0,194,168,0.4)", color: "#00C2A8", borderRadius: "8px", padding: "0.4rem 1rem", fontSize: "0.82rem", cursor: "pointer", transition: "all 0.2s ease" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(0,194,168,0.2)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "rgba(0,194,168,0.1)"}
+                >✏️ Edit</button>
+                <button
+                  onClick={() => setMode("confirmDelete")}
+                  style={{ background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.35)", color: "#ff6b6b", borderRadius: "8px", padding: "0.4rem 1rem", fontSize: "0.82rem", cursor: "pointer", transition: "all 0.2s ease" }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,80,80,0.18)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "rgba(255,80,80,0.08)"}
+                >🗑 Delete</button>
+              </div>
+            )}
+          </>
+        )}
+
+        {mode === "edit" && (
+          <>
+            <h2 className="post-modal-title" style={{ paddingRight: "2rem", marginBottom: "1.25rem" }}>Edit Post</h2>
+            <div className="post-modal-divider" style={{ marginTop: 0 }} />
+            <input type="text" placeholder="Title" value={editData.title} onChange={(e) => setEditData(d => ({ ...d, title: e.target.value }))} style={inputStyle} />
+            <textarea placeholder="Content" value={editData.post} onChange={(e) => setEditData(d => ({ ...d, post: e.target.value }))} style={{ ...inputStyle, resize: "vertical", minHeight: "140px" }} rows={5} />
+            <input type="text" placeholder="Image URL (optional)" value={editData.imageUrl} onChange={(e) => setEditData(d => ({ ...d, imageUrl: e.target.value }))} style={inputStyle} />
+            <select value={editData.tag} onChange={(e) => setEditData(d => ({ ...d, tag: e.target.value }))} style={{ ...inputStyle, marginBottom: "1rem" }} className="custom-select">
+              {TAG_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            {error && <p style={{ color: "#ff6b6b", fontSize: "0.82rem", marginBottom: "0.75rem" }}>{error}</p>}
+            <div style={{ display: "flex", gap: "0.6rem", justifyContent: "flex-end" }}>
+              <button onClick={() => { setMode("view"); setError(""); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "var(--text-secondary)", borderRadius: "8px", padding: "0.4rem 1rem", fontSize: "0.82rem", cursor: "pointer" }}>Cancel</button>
+              <button onClick={handleSave} disabled={saving} style={{ background: "rgba(0,194,168,0.15)", border: "1px solid rgba(0,194,168,0.5)", color: "#00C2A8", borderRadius: "8px", padding: "0.4rem 1.2rem", fontSize: "0.82rem", cursor: saving ? "not-allowed" : "pointer", opacity: saving ? 0.6 : 1, fontWeight: 600 }}>
+                {saving ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
+          </>
+        )}
+
+        {mode === "confirmDelete" && (
+          <div style={{ textAlign: "center", padding: "1rem 0" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🗑</div>
+            <h3 style={{ color: "#EAEAEA", marginBottom: "0.5rem" }}>Delete this post?</h3>
+            <p style={{ color: "#A0A0A0", fontSize: "0.88rem", marginBottom: "0.35rem" }}><strong style={{ color: "#EAEAEA" }}>{post.title}</strong></p>
+            <p style={{ color: "#A0A0A0", fontSize: "0.82rem", marginBottom: "1.75rem" }}>This action cannot be undone.</p>
+            {error && <p style={{ color: "#ff6b6b", fontSize: "0.82rem", marginBottom: "0.75rem" }}>{error}</p>}
+            <div style={{ display: "flex", gap: "0.6rem", justifyContent: "center" }}>
+              <button onClick={() => { setMode("view"); setError(""); }} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "var(--text-secondary)", borderRadius: "8px", padding: "0.45rem 1.25rem", fontSize: "0.85rem", cursor: "pointer" }}>Cancel</button>
+              <button onClick={handleDelete} disabled={deleting} style={{ background: "rgba(255,80,80,0.12)", border: "1px solid rgba(255,80,80,0.45)", color: "#ff6b6b", borderRadius: "8px", padding: "0.45rem 1.25rem", fontSize: "0.85rem", cursor: deleting ? "not-allowed" : "pointer", opacity: deleting ? 0.6 : 1, fontWeight: 600 }}>
+                {deleting ? "Deleting…" : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -92,7 +230,7 @@ function PostCard({ post, onClick }) {
         <div className="post-card-text">
           <div className="post-card-header">
             <span className="post-card-tag">{post.tag}</span>
-            <span className="post-card-date">{new Date(post.created_date).toLocaleDateString()}</span>
+            <span className="post-card-date">{new Date(post.updated_date).toLocaleDateString()}</span>
           </div>
           <h3 className="post-card-title">{post.title}</h3>
           <p className="post-card-preview">{preview}</p>
@@ -111,11 +249,11 @@ function PostCard({ post, onClick }) {
 
 function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
   const tags = [...new Set(posts.map((p) => p.tag))].sort((a, b) => {
-  if (a === "General") return -1;
-  if (b === "General") return 1;
-  return a.localeCompare(b);
-});
-  const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    if (a === "General") return -1;
+    if (b === "General") return 1;
+    return a.localeCompare(b);
+  });
+  const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date));
 
   return (
     <div className="posts-panel">
@@ -141,16 +279,7 @@ function AboutPanel() {
   return (
     <div className="about-panel" style={{ padding: "1.75rem 2rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "2rem", maxWidth: "720px", width: "100%" }}>
-
-        <div style={{
-          width: 72, height: 72, flexShrink: 0,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #00C2A8 0%, #006e60 100%)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "1.8rem", fontWeight: 700, color: "#0F0F0F",
-          boxShadow: "0 0 24px rgba(0,194,168,0.3)",
-        }}>K</div>
-
+        <div style={{ width: 72, height: 72, flexShrink: 0, borderRadius: "50%", background: "linear-gradient(135deg, #00C2A8 0%, #006e60 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem", fontWeight: 700, color: "#0F0F0F", boxShadow: "0 0 24px rgba(0,194,168,0.3)" }}>K</div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.3rem" }}>
             <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 700, color: "#EAEAEA" }}>Kyle Delacruz</h2>
@@ -162,41 +291,19 @@ function AboutPanel() {
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
             {["💻 Coding", "🎵 Music", "🎮 Gaming", "🌿 Outdoors", "📖 Reading"].map(chip => (
-              <span key={chip} style={{
-                fontSize: "0.72rem", padding: "0.2rem 0.65rem", borderRadius: "20px",
-                background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.2)", color: "#A0A0A0",
-              }}>{chip}</span>
+              <span key={chip} style={{ fontSize: "0.72rem", padding: "0.2rem 0.65rem", borderRadius: "20px", background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.2)", color: "#A0A0A0" }}>{chip}</span>
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
 }
 
-
 function PowerIcon() {
   return (
-    <span style={{
-      display: "block",
-      width: 12,
-      height: 12,
-      borderRadius: "50%",
-      border: "2px solid currentColor",
-      borderTopColor: "transparent",
-      position: "relative",
-    }}>
-      <span style={{
-        position: "absolute",
-        top: -4,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: 2,
-        height: 7,
-        background: "currentColor",
-        borderRadius: 1,
-      }} />
+    <span style={{ display: "block", width: 12, height: 12, borderRadius: "50%", border: "2px solid currentColor", borderTopColor: "transparent", position: "relative" }}>
+      <span style={{ position: "absolute", top: -4, left: "50%", transform: "translateX(-50%)", width: 2, height: 7, background: "currentColor", borderRadius: 1 }} />
     </span>
   );
 }
@@ -231,7 +338,7 @@ export default function App() {
   const fetchPosts = () => {
     if (!auth.token) return;
     axios
-      .get("https://blogapi-production-97d7.up.railway.app/api/BlogAPI", {
+      .get(`${API_BASE}/api/BlogAPI`, {
         headers: { Authorization: `Bearer ${auth.token}` },
       })
       .then((res) => setPosts(res.data.result))
@@ -252,31 +359,15 @@ export default function App() {
     <div className="app-root">
       <header className="header">
         <h1 className="custom-text m-0">Kyle's Island</h1>
-
         <nav className="header-nav">
           <div className="header-nav-links">
             <button className={`custom-button ${view === "about" ? "active-button" : ""}`} onClick={() => setView("about")}>Professional</button>
             <button className={`custom-button ${view === "posts" ? "active-button" : ""}`} onClick={() => setView("posts")}>Personal</button>
           </div>
-
-          {/* Power button — pure CSS icon, no unicode */}
           <button
             title={auth.token ? `Logout (${auth.username})` : "Login"}
             onClick={handleFloatingButtonClick}
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: "50%",
-              border: `2px solid ${auth.token ? "var(--accent)" : "var(--text-secondary)"}`,
-              background: auth.token ? "var(--accent-dim)" : "transparent",
-              color: auth.token ? "var(--accent)" : "var(--text-secondary)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.2s ease",
-              flexShrink: 0,
-            }}
+            style={{ width: 38, height: 38, borderRadius: "50%", border: `2px solid ${auth.token ? "var(--accent)" : "var(--text-secondary)"}`, background: auth.token ? "var(--accent-dim)" : "transparent", color: auth.token ? "var(--accent)" : "var(--text-secondary)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s ease", flexShrink: 0 }}
           >
             <PowerIcon />
           </button>
@@ -284,7 +375,6 @@ export default function App() {
       </header>
 
       {view === "about" && <About />}
-
 
       {view === "posts" && (
         <div className="split-layout">
@@ -307,16 +397,10 @@ export default function App() {
           <div className="post-modal-card" style={{ maxWidth: 400 }} onClick={(e) => e.stopPropagation()}>
             <button className="post-modal-close" onClick={() => setShowAuthModal(false)}>✕</button>
             {showRegister ? (
-              <Register
-                onRegister={() => setShowRegister(false)}
-                onSwitchToLogin={() => setShowRegister(false)}
-              />
+              <Register onRegister={() => setShowRegister(false)} onSwitchToLogin={() => setShowRegister(false)} />
             ) : (
               <Login
-                onLogin={(token, username, role) => {
-                  setAuth({ token, username, role });
-                  setShowAuthModal(false);
-                }}
+                onLogin={(token, username, role) => { setAuth({ token, username, role }); setShowAuthModal(false); }}
                 onSwitchToRegister={() => setShowRegister(true)}
               />
             )}
@@ -326,7 +410,7 @@ export default function App() {
                 style={{ width: "100%" }}
                 onClick={async () => {
                   try {
-                    const res = await fetch("https://blogapi-production-97d7.up.railway.app/api/UserAuth/login", {
+                    const res = await fetch(`${API_BASE}/api/UserAuth/login`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ username: "Guest", password: "Guest" }),
@@ -345,7 +429,23 @@ export default function App() {
         </div>
       )}
 
-      {selectedPost && <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />}
+      {selectedPost && (
+        <PostModal
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+          auth={auth}
+          onPostDeleted={(deletedId) => {
+            setPosts(prev => prev.filter(p => p.id !== deletedId));
+            setSelectedPost(null);
+            // No fetchPosts — let polling handle eventual sync
+          }}
+          onPostEdited={(updatedPost) => {
+            setPosts(prev => prev.map(p => p.id === updatedPost.id ? { ...p, ...updatedPost } : p));
+            setSelectedPost(null);
+            // No fetchPosts — let polling handle eventual sync
+          }}
+        />
+      )}
     </div>
   );
 }
