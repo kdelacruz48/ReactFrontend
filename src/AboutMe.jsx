@@ -22,7 +22,6 @@ const PROJECTS = [
       "JWT auth, guest access, and a frosted-glass login screen that previews the real app.",
     ],
     improvements: [
-      "Implement the rest of the CRUD operations so posts can be edited and deleted, not just created. Endpoints already exist in the API, just need to be wired up on the frontend.",
       "Add a rich text editor so posts support markdown or formatted content.",
       "Introduce pagination or infinite scroll as the post count grows.",
     ],
