@@ -747,6 +747,11 @@ html, body, #root {
     grid-template-columns: 1fr;
   }
 
+  .tag-button {
+    font-size: 0.72rem;  
+    padding: 0.2rem 0.5rem;  
+  }
+
   div[style*="padding: 3rem 1.5rem"] {
     padding: 1.5rem 0.75rem 3rem !important;
   }

@@ -336,7 +336,7 @@ export default function AboutMe({ professionalPosts = [], onSelectPost }) {
         maxWidth: "960px",
         margin: "0 auto",
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(380px, 100%), 1fr))", // 👈 this line
         gap: "2.5rem 3rem",
       }}>
 
