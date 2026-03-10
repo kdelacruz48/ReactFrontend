@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import API_BASE from "./API";
 
 export default function NewPost({ token, username, role, onClose, onPostCreated }) {
   const [title, setTitle] = useState("");
@@ -8,7 +9,7 @@ export default function NewPost({ token, username, role, onClose, onPostCreated 
   const [tag, setTag] = useState("General");
   const [loading, setLoading] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
-  const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Projects", "Tech", "Kira"];
+  const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Professional", "Projects", "Tech", "Kira"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export default function NewPost({ token, username, role, onClose, onPostCreated 
 
     try {
       await axios.post(
-        "https://blogapi-production-97d7.up.railway.app/api/BlogAPI",
+        `${API_BASE}/api/BlogAPI`,
         { userName: username, title, post, imageUrl, tag },
         { headers: { Authorization: `Bearer ${token}` } }
       );

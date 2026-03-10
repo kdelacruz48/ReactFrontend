@@ -7,7 +7,7 @@ const SKILLS = [
   { label: "Systems Architecture", level: 85 },
   { label: "JavaScript", level: 80 },
   { label: "SQL", level: 80 }, 
-  { label: "HTML/CCS", level: 75},
+  { label: "HTML/CSS", level: 75},
   { label: "React", level: 50 },
 ];
 
@@ -230,7 +230,7 @@ function Section({ title, children, style = {} }) {
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 
-export default function AboutMe() {
+export default function AboutMe({ professionalPosts = [], onSelectPost }) {
   return (
     <div style={{
       background: "#0F0F0F",
@@ -351,6 +351,48 @@ export default function AboutMe() {
               <TimelineItem key={item.year} {...item} last={i === TIMELINE.length - 1} />
             ))}
           </Section>
+
+         {professionalPosts.length > 0 && (
+  <Section title="Writing">
+    <div style={{
+      background: "#1e1e1e",
+      border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: "12px",
+      overflow: "hidden",
+    }}>
+      {professionalPosts.slice(0, 5).map((post, i, arr) => (
+        <div
+          key={post.id}
+          onClick={() => onSelectPost?.(post)}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            gap: "1rem",
+            padding: "0.75rem 1.3rem",
+            borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+            cursor: "pointer",
+            transition: "background 0.15s ease",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = "rgba(0,194,168,0.05)"}
+          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+        >
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: "0.85rem", color: "#EAEAEA", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {post.title}
+            </p>
+            <p style={{ margin: "0.2rem 0 0", fontSize: "0.75rem", color: "#A0A0A0", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+              {post.post}
+            </p>
+          </div>
+          <span style={{ fontSize: "0.7rem", color: "#555", flexShrink: 0 }}>
+            {new Date(post.created_date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+          </span>
+        </div>
+      ))}
+    </div>
+  </Section>
+)}
 
          <Section title="Currently">
   <div style={{

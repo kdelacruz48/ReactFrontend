@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Login from "./Login";
 import Register from "./Register";
+import API_BASE from "./API";
 
 // Static fake data — always looks great, no loading flash
 const FAKE_POSTS = [
@@ -76,15 +77,15 @@ function MockBackground() {
             {/* Text */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: "0.75rem", marginBottom: "0.3rem" }}>
-                <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 700, color: "#EAEAEA" }}>Kyle De La Cruz</h2>
+                <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 700, color: "#EAEAEA" }}>Kyle Delacruz</h2>
                 <span style={{ fontSize: "0.72rem", fontFamily: "monospace", color: "#00C2A8", letterSpacing: "0.08em" }}>Full-Stack Dev</span>
               </div>
               <p style={{ margin: "0 0 0.85rem", fontSize: "0.83rem", color: "#A0A0A0", lineHeight: 1.65 }}>
-                By day I write code, by night I'm painting or performing on the street.
+                I build web apps, tinker with side projects, and write about what's on my mind.
                 This is the personal side — thoughts, interests, and whatever I feel like sharing.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-                {["💻 Coding", "🎨 Painting", "🎭 Street Performance", "🎵 Music", "📖 Reading"].map(chip => (
+                {["💻 Coding", "🎵 Music", "🎮 Gaming", "🌿 Outdoors", "📖 Reading"].map(chip => (
                   <span key={chip} style={{
                     fontSize: "0.72rem", padding: "0.2rem 0.65rem", borderRadius: "20px",
                     background: "rgba(0,194,168,0.08)", border: "1px solid rgba(0,194,168,0.2)", color: "#A0A0A0",
@@ -128,7 +129,7 @@ export default function LoginWrapper({ onLogin }) {
   const handleGuestLogin = async () => {
     try {
       const res = await fetch(
-        "https://blogapi-production-97d7.up.railway.app/api/UserAuth/login",
+        `${API_BASE}/api/UserAuth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

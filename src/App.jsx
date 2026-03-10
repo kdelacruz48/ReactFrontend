@@ -9,7 +9,7 @@ import "./App.css";
 import API_BASE from "./API";
 
 const TRUNCATE_LENGTH = 120;
-const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Projects", "Tech", "Kira"];
+const TAG_OPTIONS = ["Art", "General", "Music", "Life", "Professional", "Projects", "Tech", "Kira"];
 
 function getImageUrl(post) {
   return post.imageUrl;
@@ -102,7 +102,6 @@ function PostModal({ post, onClose, auth, onPostDeleted, onPostEdited }) {
         },
         { headers: { Authorization: `Bearer ${auth.token}` } }
       );
-      // Update local state directly — no re-fetch
       onPostEdited({
         ...post,
         title: editData.title,
@@ -124,7 +123,6 @@ function PostModal({ post, onClose, auth, onPostDeleted, onPostEdited }) {
       await axios.delete(`${API_BASE}/api/BlogAPI/${post.id}`, {
         headers: { Authorization: `Bearer ${auth.token}` },
       });
-      // Remove from local state directly — no re-fetch
       onPostDeleted(post.id);
     } catch (err) {
       console.error("Delete failed", err);
@@ -248,12 +246,15 @@ function PostCard({ post, onClick }) {
 }
 
 function PostsPanel({ posts, filterTag, onFilterChange, onSelect }) {
-  const tags = [...new Set(posts.map((p) => p.tag))].sort((a, b) => {
+  // Exclude Professional from personal feed tag bar and cards
+  const tags = [...new Set(posts.filter(p => p.tag !== "Professional").map((p) => p.tag))].sort((a, b) => {
     if (a === "General") return -1;
     if (b === "General") return 1;
     return a.localeCompare(b);
   });
-  const filtered = [...posts].filter((p) => !filterTag || p.tag === filterTag).sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date));
+  const filtered = [...posts]
+    .filter((p) => p.tag !== "Professional" && (!filterTag || p.tag === filterTag))
+    .sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date));
 
   return (
     <div className="posts-panel">
@@ -308,6 +309,18 @@ function PowerIcon() {
   );
 }
 
+// Reusable silent guest fetch — used on mount and after logout
+const silentGuestFetch = (callback) => {
+  fetch(`${API_BASE}/api/UserAuth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: "Guest", password: "Guest" }),
+  })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => { if (data?.result?.token) callback(data.result.token); })
+    .catch(() => {});
+};
+
 export default function App() {
   const [auth, setAuth] = useState({ token: null, username: null, role: null });
   const [posts, setPosts] = useState([]);
@@ -318,12 +331,38 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
 
+  const fetchPosts = (token) => {
+    const t = token || auth.token;
+    if (!t) return;
+    axios
+      .get(`${API_BASE}/api/BlogAPI`, {
+        headers: { Authorization: `Bearer ${t}` },
+      })
+      .then((res) => setPosts(res.data.result))
+      .catch((err) => console.error("Error fetching posts:", err));
+  };
+
+  // On mount: silently fetch as guest so professional posts show on About page immediately
+  useEffect(() => {
+    if (auth.token) return;
+    silentGuestFetch(fetchPosts);
+  }, []);
+
+  // When a real user logs in, fetch with their token and set up polling
+  useEffect(() => {
+    if (!auth.token) return;
+    fetchPosts(auth.token);
+    const id = setInterval(() => fetchPosts(auth.token), 50000);
+    return () => clearInterval(id);
+  }, [auth.token]);
+
   const handleLogout = () => {
     setAuth({ token: null, username: null, role: null });
-    setPosts([]);
     setView("about");
     setShowAuthModal(false);
     setShowRegister(false);
+    // Re-fetch as guest so professional posts stay visible after logout
+    silentGuestFetch(fetchPosts);
   };
 
   const handleFloatingButtonClick = () => {
@@ -334,23 +373,6 @@ export default function App() {
       setShowAuthModal(true);
     }
   };
-
-  const fetchPosts = () => {
-    if (!auth.token) return;
-    axios
-      .get(`${API_BASE}/api/BlogAPI`, {
-        headers: { Authorization: `Bearer ${auth.token}` },
-      })
-      .then((res) => setPosts(res.data.result))
-      .catch((err) => console.error("Error fetching posts:", err));
-  };
-
-  useEffect(() => {
-    if (!auth.token) return;
-    fetchPosts();
-    const id = setInterval(fetchPosts, 50000);
-    return () => clearInterval(id);
-  }, [auth.token]);
 
   if (!auth.token && view === "posts")
     return <LoginWrapper onLogin={(token, username, role) => { setAuth({ token, username, role }); setView("posts"); }} />;
@@ -374,7 +396,12 @@ export default function App() {
         </nav>
       </header>
 
-      {view === "about" && <About />}
+      {view === "about" && (
+        <About
+          professionalPosts={posts.filter(p => p.tag === "Professional")}
+          onSelectPost={setSelectedPost}
+        />
+      )}
 
       {view === "posts" && (
         <div className="split-layout">
@@ -387,7 +414,7 @@ export default function App() {
         <>
           <button className="floating-button" onClick={() => setShowNewPost(true)}>+</button>
           {showNewPost && (
-            <NewPost token={auth.token} username={auth.username} role={auth.role} onClose={() => setShowNewPost(false)} onPostCreated={fetchPosts} />
+            <NewPost token={auth.token} username={auth.username} role={auth.role} onClose={() => setShowNewPost(false)} onPostCreated={() => fetchPosts(auth.token)} />
           )}
         </>
       )}
@@ -437,12 +464,10 @@ export default function App() {
           onPostDeleted={(deletedId) => {
             setPosts(prev => prev.filter(p => p.id !== deletedId));
             setSelectedPost(null);
-            // No fetchPosts — let polling handle eventual sync
           }}
           onPostEdited={(updatedPost) => {
             setPosts(prev => prev.map(p => p.id === updatedPost.id ? { ...p, ...updatedPost } : p));
             setSelectedPost(null);
-            // No fetchPosts — let polling handle eventual sync
           }}
         />
       )}
